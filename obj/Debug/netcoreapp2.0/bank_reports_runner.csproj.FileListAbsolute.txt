@@ -1,0 +1,4 @@
+c:\Users\Mobolaji.Aina\Documents\c_sharp\bank_reports_runner\obj\Debug\netcoreapp2.0\bank_reports_runner.csprojAssemblyReference.cache
+c:\Users\Mobolaji.Aina\Documents\c_sharp\bank_reports_runner\obj\Debug\netcoreapp2.0\bank_reports_runner.csproj.CoreCompileInputs.cache
+c:\Users\Mobolaji.Aina\Documents\c_sharp\bank_reports_runner\obj\Debug\netcoreapp2.0\bank_reports_runner.AssemblyInfoInputs.cache
+c:\Users\Mobolaji.Aina\Documents\c_sharp\bank_reports_runner\obj\Debug\netcoreapp2.0\bank_reports_runner.AssemblyInfo.cs
