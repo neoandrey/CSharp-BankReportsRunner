@@ -99,12 +99,11 @@ namespace BankReportRunner{
                 public static int  connectionPacketSize                                          = 8192;   
 
                 public static bool savePasswords                                                 = true;   
-        public   BankReportUtilLibrary(){ 
+                public   BankReportUtilLibrary(){ 
 
                        initBankReportUtilLibrary();
 
                 }
-			
       			public   BankReportUtilLibrary(string  cfgFile){
 					
 					   if(!string.IsNullOrEmpty(cfgFile) ){
@@ -223,7 +222,7 @@ namespace BankReportRunner{
                         sendEmailNotification        = reportConfig.send_email_notification; 
                         reportOutputMethod           = reportConfig.report_output_method; 
                         reportFileName               = reportConfig.output_file_name;
-                        reportTableName		         = reportConfig.output_table_name;
+                        reportTableName		         = reportConfig.final_output_table_name;
                         WAIT_INTERVAL                = reportConfig.wait_interval;
                         temporaryTableName           = reportConfig.temporary_table_name;
                         scriptOrderMap               = reportConfig.script_order_map;

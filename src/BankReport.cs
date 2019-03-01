@@ -50,6 +50,7 @@ namespace BankReportRunner{
 						new  BankReportUtilLibrary();
 						reportParameterTable =  initParameterTable();
 						startReportGeneration();
+						 BankReportUtilLibrary.closeLogFile();
             			
 					 
 
@@ -64,6 +65,8 @@ namespace BankReportRunner{
 						   new  BankReportUtilLibrary(nuConfig);
 						   reportParameterTable =  initParameterTable();
                    		   startReportGeneration();
+						   BankReportUtilLibrary.closeLogFile();
+						   
                			
 					} else{
 						
@@ -92,7 +95,7 @@ namespace BankReportRunner{
 						}
 
 						if( serverIsReachable(connectionStringMap["source"])){
-							if(BankReportUtilLibrary.reportOutputMethod == BankReportUtilLibrary.TABLE_OUTPUT_METHOD && string.IsNullOrEmpty(BankReportUtilLibrary.reportTableName)){
+							if((BankReportUtilLibrary.reportOutputMethod == BankReportUtilLibrary.TABLE_OUTPUT_METHOD) && string.IsNullOrEmpty(BankReportUtilLibrary.reportTableName)){
 								Console.WriteLine("No table has been specified for the report data");
 								BankReportUtilLibrary.writeToLog("No table has been specified for the report data");
                                 Environment.Exit(0);
@@ -119,13 +122,13 @@ namespace BankReportRunner{
                                     
 					
 								   Thread  minThread = 	new Thread(()=> {
-									   scriptToPartMinMap.Add( index, getAggregate("MIN",partitionField, tableNolock,connectionStringMap["source"]));
+									   scriptToPartMinMap.Add( index, getAggregate("MIN",partitionField, tableNolock,"source"));
 									
 									});
 									minThread.Name      = "min_thread_for_"+table+"."+index.ToString();
                                    
 								    Thread  maxThread = 	new Thread(()=> {
-									 scriptToPartMinMap.Add( index, getAggregate("MAX",partitionField, tableNolock,connectionStringMap["source"]));
+									 scriptToPartMinMap.Add( index, getAggregate("MAX",partitionField, tableNolock,"source"));
 
 									});
 									maxThread.Name      = "max_thread_for_"+table+"."+index.ToString();
@@ -553,7 +556,7 @@ namespace BankReportRunner{
 
 			 public long getAggregate (string aggr, string columnName,string tableName, string server){
 				  
-				   string script                       = "SELECT  aggr_val  = "+aggr+"("+columnName+") FROM "+tableName+" WITH (NOLOCK)";
+				   string script                       = "SELECT  aggr_val  = "+aggr+"("+columnName+") FROM "+tableName;
 				   System.Data.DataTable aggregateVal  = getDataFromSQL(script, connectionStringMap[server]);
 				   return string.IsNullOrEmpty(aggregateVal.Rows[0]["aggr_val"].ToString())?0: long.Parse(aggregateVal.Rows[0]["aggr_val"].ToString());    
 
