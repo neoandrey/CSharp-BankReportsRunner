@@ -20,9 +20,6 @@ using System.Data.SQLite;
 namespace BankReportRunner{
 
             public class  BankReport {
-
-                 internal  static System.Data.DataTable[]  	       reportStagingTables;
-				 internal  static Thread[]						   reportStagingThreads;
                  internal  static Dictionary<string, string>       connectionStringMap     			    = new Dictionary<string,string>();	
 			     internal  static Dictionary<string, string>       partitionSizeIntervalMap   			= new Dictionary<string,string>();	    
 				 internal  static string                           sourceServerConnectionString;   
@@ -37,8 +34,8 @@ namespace BankReportRunner{
 
 				 internal  static  Dictionary<int,int>             indexSizeMap						   = new Dictionary<int,int> ();
 				 internal  static  DataTable					   schemaTable                          =  new DataTable();
-				 internal  static  Dictionary<int,long>            scriptToPartMinMap                        =   new Dictionary<string,string> (); 
-				 internal  static  Dictionary<int,long>           scriptToPartMaxMap                        =   new Dictionary<string,string> ();               
+				 internal  static  Dictionary<int,long>            scriptToPartMinMap                        =   new Dictionary<int,long> (); 
+				 internal  static  Dictionary<int,long>           scriptToPartMaxMap                        =   new Dictionary<int,long> ();               
 			      static readonly object locker = new object();
 				 internal static  HashSet<Thread> minMaxThreadSet                                        = new HashSet<Thread>();
 				 internal static  HashSet<Thread> scriptThreadSet                                        = new HashSet<Thread>();
@@ -56,9 +53,6 @@ namespace BankReportRunner{
 
                 public BankReport(string  config){
 				  
-					
-					Console.WriteLine("Starting  web server  on port: " + BankReportUtilLibrary.httpPort.ToString());
-                    BankReportUtilLibrary.writeToLog("Starting  web server  on port: " + BankReportUtilLibrary.httpPort);
 					string  nuConfig   = config.Contains("\\\\")? config:config.Replace("\\", "\\\\");
                  
 					if(File.Exists(nuConfig)){
@@ -154,10 +148,9 @@ namespace BankReportRunner{
 									finalScriptBuilder.Length--;
 								}
 								 finalScriptBuilder.Append(") finTable");
-								  finalReportScript    =  finalReportScript.Replace("ALL_TEMP_TABLES", finalScriptBuilder.ToString();
+								  finalReportScript    =  finalReportScript.Replace("ALL_TEMP_TABLES", finalScriptBuilder.ToString());
                     		
                                 bulkCopyDataFromRemoteServer(finalReportScript,BankReportUtilLibrary.finalOutputTableName);
-
 						}else{
 								Console.WriteLine("Unable to connect to source database: "+BankReportUtilLibrary.sourceServer);
 								BankReportUtilLibrary.writeToLog("Unable to connect to source database: "+BankReportUtilLibrary.sourceServer);
@@ -460,227 +453,8 @@ namespace BankReportRunner{
 
 					File.WriteAllText(fileName, sb.ToString());
 
-	  }
+	  } 
 
-        public static DataTable readStoredTableData(string strFilePath)
-        {
-            DataTable dt = new DataTable();
-            using (StreamReader sr = new StreamReader(strFilePath))
-            {
-                string[] headers = sr.ReadLine().Split(new string[] { BankReportUtilLibrary.temporaryFileFieldDelimeter }, StringSplitOptions.None);
-                foreach (string header in headers)
-                {
-                    dt.Columns.Add(header);
-                }
-                while (!sr.EndOfStream)
-                {
-                    string[] rows = sr.ReadLine().Split(new string[] { BankReportUtilLibrary.temporaryFileFieldDelimeter }, StringSplitOptions.None);
-                    DataRow dr = dt.NewRow();
-                    for (int i = 0; i < headers.Length; i++)
-                    {
-                        dr[i] = rows[i];
-                    }
-                    dt.Rows.Add(dr);
-                }
-
-            }
-            return dt;
-        }
-
-        public static string getTempFilePath(int fileIndex)
-        {
-
-            int mapSize = BankReportUtilLibrary.tempFileDriveMap.Count;
-            int modulo = fileIndex % mapSize;
-            return BankReportUtilLibrary.tempFilePathMap[modulo];
-
-        }
-
-		public  void  exportToSQLite(int  index){
-		
-		string dbFileName       =  getTempFilePath(index)+ "\\" + BankReportUtilLibrary.temporaryFileNamePrefix + "_" + index.ToString() + ".sqlite";
-		string sqliteTableName  =  BankReportUtilLibrary.temporaryTableName+"_"+index.ToString();
-		if (!File.Exists(dbFileName)){
-		 try{
-            using( SQLiteConnection liteConnect = new SQLiteConnection("Data Source="+dbFileName+";Version=3;")){
-			liteConnect.Open();
-			string sql = "SELECT 1 FROM sqlite_master WHERE type='table' AND name='"+sqliteTableName+"';";
-			Console.WriteLine("Running: "+sql);
-
-			SQLiteCommand command = new SQLiteCommand(sql, liteConnect);
-			Object result = command.ExecuteScalar();
-			command.Dispose();
-			Console.WriteLine("result: "+result.ToString());
-			
-			if(result.ToString() != "1"){
-				
-			  StringBuilder  createSqlBuilder   = new StringBuilder();
-			  createSqlBuilder.Append(" CREATE TABLE ["+sqliteTableName+"] ( ");
-			  string colDataType  = "";
-			  foreach(DataColumn col in reportStagingTables[index].Columns){
-		 
-		 		if(col.DataType.Name.ToString()=="Boolean")
-		 		{
-		 		colDataType = "INTEGER";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Byte")
-		 		{
-		 		colDataType = "BLOB";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Char")
-		 		{
-		 		    colDataType = "TEXT";
-		 		}
-		 		if(col.DataType.Name.ToString()=="TEXT")
-		 		{
-		 		colDataType = "TEXT";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Decimal")
-		 		{
-		 		colDataType = "REAL";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Double")
-		 		{
-		 		colDataType = "REAL";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Int16")
-		 		{
-		 		colDataType = "INTEGER";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Int32")
-		 		{
-		 		colDataType = "INTEGER";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Int64")
-		 		{
-		 		colDataType = "INTEGER";
-		 		}
-		 		if(col.DataType.Name.ToString()=="SByte")
-		 		{
-		 		colDataType = "BLOB";
-		 		}
-		 		if(col.DataType.Name.ToString()=="Single")
-		 		{
-		 		colDataType = "BLOB";
-		 		}
-		 		if(col.DataType.Name.ToString()=="String")
-		 
-		 		{
-		 			colDataType = "TEXT";
-		 		}
-		 		if(col.DataType.Name.ToString()=="TimeSpan")
-		 
-		 		{
-		 			colDataType = "TEXT";
-		 		}
-		 		if(col.DataType.Name.ToString()=="UInt16")
-		 
-		 		{
-		 			colDataType = "TEXT";
-		 		}
-		 		if(col.DataType.Name.ToString()=="UInt32")
-		 
-		 		{
-		 			colDataType = "INTEGER";
-		 		}
-		 		if(col.DataType.Name.ToString()=="UInt64")
-		 
-		 		{
-		 			colDataType = "INTEGER";
-		 		}
-		 		
-					createSqlBuilder.Append(col.ColumnName);
-					createSqlBuilder.Append("\t");
-					createSqlBuilder.Append(colDataType);
-					createSqlBuilder.Append(",");
-
-		 	 	 }
-				createSqlBuilder.Length--;
-				createSqlBuilder.Append(" );");		  			    
-				string sql2 = createSqlBuilder.ToString();
-				BankReportUtilLibrary.writeToLog("Running: "+sql2);
-				SQLiteCommand command2 = new SQLiteCommand(sql2, liteConnect);
-				command2.CommandTimeout = -1;
-				command2.ExecuteNonQuery();
-				command2.Dispose();
-			
-			}
-			StringBuilder  tableColumnString  = new StringBuilder();
-			  foreach (DataColumn column in reportStagingTables[index].Columns){
-			  
-			      tableColumnString.Append(column.ColumnName.ToString()).Append(",");
-			 
-			 }
-			 tableColumnString.Length--;
-			StringBuilder  insertBuilder      = new StringBuilder();
-			
-		   foreach (DataRow row in reportStagingTables[index].Rows){
-		            insertBuilder.Append("INSERT INTO ").Append(sqliteTableName).Append("( ").Append(tableColumnString.ToString()).Append(" ) VALUES ( ");
-			    foreach (DataColumn column in reportStagingTables[index].Columns){
-			      
-			      if(column.DataType.Name.ToString().Contains("TEXT") || column.DataType.Name.ToString().Contains("Char") || column.DataType.Name.ToString().Contains("String") ) {
-			      
-			        insertBuilder.Append("\'").Append(row[column].ToString()).Append(", ").Append("\'");
-			    
-			       } else{
-			         insertBuilder.Append(row[column].ToString()).Append(", ");
-			       }
-			    
-			      }
-			      insertBuilder.Length--;
-			      insertBuilder.Append(") ");
-			      SQLiteCommand command3 = new SQLiteCommand(insertBuilder.ToString(), liteConnect);
-			      command3.CommandTimeout = -1;
-			      command3.ExecuteNonQuery();
-			      command3.Dispose();
-			      
-			    }
-			//	reportStagingTables[index].Clear();
-			}	
-		}catch(Exception e){
-				BankReportUtilLibrary.writeToLog("Error saving table with  index "+index+" to SQLite. Message : " + e.Message);
-				Console.WriteLine("Error saving table with  index "+index+" to SQLite. Message : " + e.Message);
-				BankReportUtilLibrary.writeToLog(e.StackTrace);
-				BankReportUtilLibrary.writeToLog(e.ToString());
-				Console.WriteLine(e.StackTrace);
-				Console.WriteLine(e.ToString());
-				 
-			  }
-		}
-		}
-
-
-	public  static  void  loadDataFromSQLite(int  index){
-	
-		string dbFileName       =  getTempFilePath(index)+ "\\" + BankReportUtilLibrary.temporaryFileNamePrefix + "_" + index.ToString() + ".sqlite";
-		string sqliteTableName  =  BankReportUtilLibrary.temporaryTableName+"_"+index.ToString();	
-		if (File.Exists(dbFileName)){
-		try{
-                    using (SQLiteConnection liteConnect = new SQLiteConnection("Data Source=" + dbFileName + ";Version=3;"))
-                    {
-                        liteConnect.Open();
-                        string sql = "SELECT  * FROM " + sqliteTableName + ";";
-                        Console.WriteLine("Running: " + sql);
-                        SQLiteCommand command = new SQLiteCommand(sql, liteConnect);
-                        reportStagingTables[index] = new DataTable();
-                        SQLiteDataReader reader = command.ExecuteReader();
-                        reportStagingTables[index].Load(reader);
-		}
-	}catch(Exception  e){
-                    BankReportUtilLibrary.writeToLog("Error reading data for table with  index " + index + " from SQLite. Message : " + e.Message);
-                    Console.WriteLine("Error reading data for table with " + index + " from SQLite. Message : " + e.Message);
-                    BankReportUtilLibrary.writeToLog(e.StackTrace);
-                    BankReportUtilLibrary.writeToLog(e.ToString());
-                    Console.WriteLine(e.StackTrace);
-                    Console.WriteLine(e.ToString());
-		
-	}
-
-	}else{
-	  Console.WriteLine("Could not find file "+dbFileName);
-                BankReportUtilLibrary.writeToLog("Could not find file "+dbFileName);
-	}
-			}
         public static void bulkCopyDataFromRemoteServer( string copyScript, string destTable)
         {
 
@@ -1015,11 +789,11 @@ namespace BankReportRunner{
 
 					}
 
-					string replacementScript = " (SELECT * FROM "+scriptMainTable+" WITH  (NOLOCK) WHERE {0}>={1} AND {3}<={4})temp ",partitionField,startRecordID,partitionField,endRecordID);
+					string replacementScript = " SELECT * FROM "+scriptMainTable+" WITH  (NOLOCK) WHERE "+partitionField+">="+startRecordID.ToString()+" AND "+partitionField+"<="+endRecordID.ToString()+")temp ";
                     ;
 
 				  Thread  scriptPartionThread = 	new Thread(()=>{ 
-						  loadPartitionDataTables( "source", scriptBuilder.Replace(scriptMainTable, replacementScript), index, scriptID );
+						  loadPartitionDataTables( "source", scriptBuilder.Replace(scriptMainTable, replacementScript).ToString(), index, scriptID );
 							 
 						 });
 						 scriptPartionThread.Name    =  "script_partition_thread_"+i.ToString()+"_for_"+scriptMainTable+"_of_script_"+scriptID.ToString();
@@ -1029,24 +803,23 @@ namespace BankReportRunner{
 
 				  foreach(Thread  scriptThread in scriptThreadSet){
 
-							scriptPartionThread.Join();
+							scriptThread.Join();
 
 				  }
 				  createIndexesOnScriptTable(scriptID);
 				 }catch(Exception e){
 					 
 					Console.WriteLine("Error running script number "+scriptID.ToString()+". Details: "+e.Message);
-                    writeToLog("Error running script number "+scriptID.ToString()+". Details: "+e.Message);
+                   BankReportUtilLibrary.writeToLog("Error running script number "+scriptID.ToString()+". Details: "+e.Message);
 
 				 }
 
                   
 
 
-
 			  }
 
-			  public   void  loadPartitionDataTables(string sourceServer,  string bulkQuery, int tabInd, int scriptID ){
+			  public static  void  loadPartitionDataTables(string sourceServer,  string bulkQuery, int tabInd, int scriptID ){
                     				
 					string   targetConnectionString         = connectionStringMap[sourceServer];
 				    using(SqlConnection conn = new SqlConnection(targetConnectionString)){
@@ -1091,7 +864,7 @@ namespace BankReportRunner{
 									BankReportUtilLibrary.writeToLog("Error while running report script: "+bulkQuery+". The error is: "+e.Message);
 									BankReportUtilLibrary.writeToLog(e.ToString());
 									BankReportUtilLibrary.writeToLog("The data fetch session would now be restarted");
-									loadPartitionDataTables( sourceServer,   bulkQuery,tabInd );
+									loadPartitionDataTables( sourceServer,   bulkQuery,tabInd,scriptID );
 									emailError.AppendLine("<div style=\"color:red\">Error while running report script: "+bulkQuery+". The error is: "+e.Message);
 									emailError.AppendLine("<div style=\"color:red\">(Restarted):"+e.StackTrace);
 								}else{
@@ -1125,16 +898,16 @@ namespace BankReportRunner{
 					
 	  
 }
-public  void createIndexesOnScriptTable (int  scriptID){
+public static void createIndexesOnScriptTable (int  scriptID){
 
       string tableName             =  BankReportUtilLibrary.scriptOutputTables[scriptID].ToString();
-	  string indexScriptPath       =  BankReportUtilLibrary.outputTableIndexScriptMap[scriptID].ToString();
+	  string indexScriptPath       =  BankReportUtilLibrary.outputTableIndexScriptMap[tableName].ToString();
 	  string  indexScript   	   =  File.ReadAllText(indexScriptPath).Replace("TABLE_NAME",tableName);
 	  executeScript(indexScript,connectionStringMap["destination"]);
 	  
 }
 
-			    public static void Main (string[] args){
+ 			    public static void Main (string[] args){
 				
 				 string configFile 		= ""; 
 
