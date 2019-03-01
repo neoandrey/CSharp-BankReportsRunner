@@ -43,7 +43,7 @@ namespace BankReportRunner{
 				public  static Dictionary<string, string>   outputTableIndexScriptMap	 			 = new  Dictionary<string, string> ();
 		        public  static ConnectionProperty 		    sourceConnectionProps;
                 public  static ConnectionProperty 		    destinationConnectionProps;
-                public  static string                       alternateRowColour                   = "#cce0ff";
+                public  static string                       alternateRowColour                   = "#ffe0ff";
                 public  static string                       emailFontFamily                      = "arial,times new roman,verdana,sans-serif;";
                 public  static string                       emailFontSize                        = "11px";
                 public  static string                       colour                               = "#333333";
@@ -94,8 +94,12 @@ namespace BankReportRunner{
                 public static string    reportEndDateField       				                 = "";
                 public static Dictionary<string,string>    reportParameterToValueMap            = new Dictionary<string,string>();
                 public static string    finalScriptPath                                          = "";
-                public static  Dictionary<string,string>     scriptOrderMap                       = new  Dictionary<string,string> ();           
-        public   BankReportUtilLibrary(){
+                public static  Dictionary<string,string>     scriptOrderMap                      = new  Dictionary<string,string> (); 
+
+                public static int  connectionPacketSize                                          = 8192;   
+
+                public static bool savePasswords                                                 = true;   
+        public   BankReportUtilLibrary(){ 
 
                        initBankReportUtilLibrary();
 
@@ -108,8 +112,8 @@ namespace BankReportRunner{
 						   string  nuCfgFile  = "";
                            Console.WriteLine("Logging report activities to file: "+logFile);
                            Console.WriteLine("");
-						   Console.WriteLine("Loading configurations in  configuration file: "+cfgFile);
-						   nuCfgFile           =  cfgFile.Contains("\\\\")? cfgFile:cfgFile.Replace("\\", "\\\\");
+						   Console.WriteLine("Loading settings in configuration file: "+cfgFile);
+						   nuCfgFile           =  cfgFile;//.Contains("\\\\")? cfgFile:cfgFile.Replace("\\", "\\\\");
 
 						   try{
 							   if(File.Exists(nuCfgFile)){
@@ -223,6 +227,14 @@ namespace BankReportRunner{
                         WAIT_INTERVAL                = reportConfig.wait_interval;
                         temporaryTableName           = reportConfig.temporary_table_name;
                         scriptOrderMap               = reportConfig.script_order_map;
+                        connectionPacketSize         = reportConfig.connection_packet_size;
+                        savePasswords                = reportConfig.save_passwords;
+
+                        if(!savePasswords){
+
+                                File.Delete(".\\db\\storekeeper.sqlite");
+
+                        }
     
                         Console.WriteLine("sourceServer: "+sourceServer);
                         Console.WriteLine("sourceDatabase: "+sourceDatabase);

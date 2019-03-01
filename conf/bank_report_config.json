@@ -5,6 +5,7 @@
     "destination_server": "localhost",
     "destination_database": "postilion_office",
     "destination_port": 1433,
+    "connection_packet_size": 16383, /* between 512 and 32767*/
     "source_scripts": ["sql\\web_nibss_1.sql", "sql\\web_nibss_2.sql", "sql\\web_nibss_3.sql"],
     "script_output_tables": ["b04_web_nibss_temp_1", "b04_web_nibss_temp_2", "b04_web_nibss_temp_3"],
     "create_indexes_on_output_tables": true,
@@ -62,6 +63,7 @@
     "output_file_name": "",
     "wait_interval": 100,
     "temp_table_name_prefix": "temp_report_table",
-    "final_script_path": "sql\\web_nibss_final.sql"
+    "final_script_path": "sql\\web_nibss_final.sql",
+    "save_passwords": false
 
 }

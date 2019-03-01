@@ -60,7 +60,11 @@ namespace BankReportRunner
              public string     output_file_name                  { set; get; }
              public string     output_table_name                 { set; get;} 
 
-             public Dictionary<string,string>     script_order_map                    {set; get;}
+             public Dictionary<string,string>  script_order_map  {set; get;}
+
+             public  int   connection_packet_size               {set; get;}
+
+             public  bool save_passwords  {set; get;}
              
              
             

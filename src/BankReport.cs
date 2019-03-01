@@ -16,6 +16,7 @@ using System.Net.Mail;
 using System.Data.OleDb;
 using System.Data.DataSetExtensions;
 using System.Data.SQLite;
+using System.Reflection;
 
 namespace BankReportRunner{
 
@@ -39,25 +40,29 @@ namespace BankReportRunner{
 			      static readonly object locker = new object();
 				 internal static  HashSet<Thread> minMaxThreadSet                                        = new HashSet<Thread>();
 				 internal static  HashSet<Thread> scriptThreadSet                                        = new HashSet<Thread>();
-				 internal static  HashSet<Thread> mainReportThreadSet                                       = new  HashSet<Thread>();
+				 internal static  HashSet<Thread> mainReportThreadSet                                    = new  HashSet<Thread>();
 				 internal static DataTable[]  reportPartitionTables; 
-				 internal  static Object 		 insertLock 							= new Object();
+				 internal  static Object 		 insertLock 							                 = new Object();
+                 
+				 internal  static  DataTable    reportParameterTable                                    =  new DataTable();    
 				 public BankReport(){
 
 						new  BankReportUtilLibrary();
+						reportParameterTable =  initParameterTable();
 						startReportGeneration();
             			
 					 
 
 				 }
 
-                public BankReport(string  config){
+                public BankReport(string config){
 				  
-					string  nuConfig   = config.Contains("\\\\")? config:config.Replace("\\", "\\\\");
+			  	string  nuConfig   = config;//.Contains("\\\\")? config:config.Replace("\\", "\\\\");
                  
 					if(File.Exists(nuConfig)){
 
-						   new  BankReportUtilLibrary(config);
+						   new  BankReportUtilLibrary(nuConfig);
+						   reportParameterTable =  initParameterTable();
                    		   startReportGeneration();
                			
 					} else{
@@ -173,8 +178,8 @@ namespace BankReportRunner{
               }
            			  public static void initConnectionStrings(){
  				  
- 				    sourceServerConnectionString   =  "Network Library=DBMSSOCN;Data Source=" +  BankReportUtilLibrary.sourceConnectionProps.getSourceServer() + ","+BankReportUtilLibrary.sourcePort+";database=" + BankReportUtilLibrary.sourceConnectionProps.getSourceDatabase()+ ";User id=" + BankReportUtilLibrary.sourceConnectionProps.getSourceUser()+ ";Password=" + BankReportUtilLibrary.sourceConnectionProps.getSourcePassword() + ";Connection Timeout=0;Pooling=false;Packet Size=8192;";     
-                     destServerConnectionString     =  "Network Library=DBMSSOCN;Data Source=" +  BankReportUtilLibrary.destinationConnectionProps.getSourceServer() + ","+BankReportUtilLibrary.destinationPort+";database=" + BankReportUtilLibrary.destinationConnectionProps.getSourceDatabase()+ ";User id=" +  BankReportUtilLibrary.destinationConnectionProps.getSourceUser()+ ";Password=" + BankReportUtilLibrary.destinationConnectionProps.getSourcePassword() + ";Connection Timeout=0;Pooling=false;Packet Size=8192;";    
+ 				    sourceServerConnectionString     =  "Network Library=DBMSSOCN;Data Source=" +  BankReportUtilLibrary.sourceConnectionProps.getSourceServer() + ","+BankReportUtilLibrary.sourcePort+";database=" + BankReportUtilLibrary.sourceConnectionProps.getSourceDatabase()+ ";User id=" + BankReportUtilLibrary.sourceConnectionProps.getSourceUser()+ ";Password=" + BankReportUtilLibrary.sourceConnectionProps.getSourcePassword() + ";Connection Timeout=0;Pooling=false;Packet Size="+BankReportUtilLibrary.connectionPacketSize.ToString()+";";     
+                    destServerConnectionString       =  "Network Library=DBMSSOCN;Data Source=" +  BankReportUtilLibrary.destinationConnectionProps.getSourceServer() + ","+BankReportUtilLibrary.destinationPort+";database=" + BankReportUtilLibrary.destinationConnectionProps.getSourceDatabase()+ ";User id=" +  BankReportUtilLibrary.destinationConnectionProps.getSourceUser()+ ";Password=" + BankReportUtilLibrary.destinationConnectionProps.getSourcePassword() + ";Connection Timeout=0;Pooling=false;Packet Size="+BankReportUtilLibrary.connectionPacketSize.ToString()+";";    
      				connectionStringMap.Add("source",sourceServerConnectionString);
  					connectionStringMap.Add("destination",destServerConnectionString);
   
@@ -897,15 +902,66 @@ namespace BankReportRunner{
 					}
 					
 	  
-}
-public static void createIndexesOnScriptTable (int  scriptID){
+				}
 
-      string tableName             =  BankReportUtilLibrary.scriptOutputTables[scriptID].ToString();
-	  string indexScriptPath       =  BankReportUtilLibrary.outputTableIndexScriptMap[tableName].ToString();
-	  string  indexScript   	   =  File.ReadAllText(indexScriptPath).Replace("TABLE_NAME",tableName);
-	  executeScript(indexScript,connectionStringMap["destination"]);
-	  
-}
+				 public static DataTable initParameterTable(){
+					DataTable table = new DataTable("PropertiesTable");
+			
+				DataColumn column;
+				DataRow row;  
+				column				        = new DataColumn();
+				
+				column.DataType 		     = System.Type.GetType("System.Int32");
+				column.ColumnName 		     = "no.";
+				column.ReadOnly 		     = true;
+				column.Unique 				 = true;
+				column.AutoIncrement 		 = true;
+				table.Columns.Add(column);
+				column				     	 = new DataColumn();
+				column.DataType 			 = System.Type.GetType("System.String");
+				column.ColumnName 		     = "parameter_name";
+				column.AutoIncrement 		 = false;
+				column.Caption 				 = "ParameterName";
+				column.ReadOnly 			 = false;
+				column.Unique 				 = true;
+				table.Columns.Add(column);
+				column 						 = new DataColumn();
+				column.DataType 			 = System.Type.GetType("System.String");
+				column.ColumnName 			 = "parameter_value";
+				column.AutoIncrement 		 = false;
+				column.Caption 				 = "ParameterValue";
+				column.ReadOnly 			 = false;
+				column.Unique 				 = false;
+				table.Columns.Add(column);
+
+				DataColumn[] PrimaryKeyColumns = new DataColumn[1];
+				PrimaryKeyColumns[0] = table.Columns["no."];
+				table.PrimaryKey = PrimaryKeyColumns;
+				
+				foreach (PropertyInfo prop in BankReportUtilLibrary.reportConfig.GetType().GetProperties())
+				{
+					
+					if(null!=prop.GetValue(BankReportUtilLibrary.reportConfig) && null!= prop.Name){
+						row = table.NewRow();
+						row["parameter_name"]  = prop.Name;
+						row["parameter_value"] = string.IsNullOrWhiteSpace(prop.GetValue(BankReportUtilLibrary.reportConfig,  null).ToString())?"NULL":prop.GetValue(BankReportUtilLibrary.reportConfig,  null).ToString();
+				        Console.WriteLine(prop.Name+": "+row["parameter_value"]);
+						table.Rows.Add(row);
+					}
+						
+				}
+
+                 return  table;
+
+				 }
+				public static void createIndexesOnScriptTable (int  scriptID){
+
+					string tableName             =  BankReportUtilLibrary.scriptOutputTables[scriptID].ToString();
+					string indexScriptPath       =  BankReportUtilLibrary.outputTableIndexScriptMap[tableName].ToString();
+					string  indexScript   	   =  File.ReadAllText(indexScriptPath).Replace("TABLE_NAME",tableName);
+					executeScript(indexScript,connectionStringMap["destination"]);
+					
+				}
 
  			    public static void Main (string[] args){
 				
