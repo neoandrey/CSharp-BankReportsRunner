@@ -557,8 +557,9 @@ namespace BankReportRunner{
 			 public long getAggregate (string aggr, string columnName,string tableName, string server){
 				  
 				   string script                       = "SELECT  aggr_val  = "+aggr+"("+columnName+") FROM "+tableName;
-				   System.Data.DataTable aggregateVal  = getDataFromSQL(script, connectionStringMap[server]);
-				   return string.IsNullOrEmpty(aggregateVal.Rows[0]["aggr_val"].ToString())?0: long.Parse(aggregateVal.Rows[0]["aggr_val"].ToString());    
+				   System.Data.DataTable aggregateVal  = !string.IsNullOrWhiteSpace(getDataFromSQL(script, connectionStringMap[server]).ToString())?getDataFromSQL(script, connectionStringMap[server]): new DataTable();
+				   long  returnVal =  aggregateVal.Rows.Count >0 && string.IsNullOrEmpty(aggregateVal.Rows[0]["aggr_val"].ToString())?0: long.Parse(aggregateVal.Rows[0]["aggr_val"].ToString());   
+				   return returnVal; 
 
 			}
 		public static void  createFinalView(int totalTables){
