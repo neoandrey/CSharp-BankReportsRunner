@@ -28,7 +28,7 @@
     "batch_size": 1000,
     "has_date_range": true,
     "report_start_date_value": "20190216",
-    "report_end_date_value": "20190216",
+    "report_end_date_value": "20190217",
     "report_start_date_field": "@report_date_start",
     "report_end_date_field": "@report_date_end",
     "report_parameter_to_value_map": {
