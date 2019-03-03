@@ -11,11 +11,19 @@ set proxy_filepath=%cd%\proxy.txt
       set /p proxy_url=   
  )
 
-IF [%proxy_url%] == [] SET proxy_url=""
- 
+IF [%proxy_url%] == [] (
+
+SET proxy_url=""
+ type NUL > %cd%\proxy.txt
+echo "removing proxy"
+ SET  HTTP_PROXY=
+ SET  HTTPS_PROXY=
+) ELSE (
 echo  %proxy_url%>%cd%\proxy.txt
 echo "setting proxy as:%proxy_url%"
  SET  HTTP_PROXY=%proxy_url%
  SET  HTTPS_PROXY=%proxy_url%
+)
+
 powershell  -File  %cd%\run.ps1
 pause
