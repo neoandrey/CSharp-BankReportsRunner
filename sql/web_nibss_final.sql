@@ -1,3 +1,4 @@
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
 DECLARE @temp_table_1  TABLE   (aggregate_column varchar(200), counts float )
 

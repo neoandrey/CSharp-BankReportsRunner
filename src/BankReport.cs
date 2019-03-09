@@ -108,10 +108,10 @@ namespace BankReportRunner{
 								BankReportUtilLibrary.writeToLog("No filename  has been specified for the report data");
                                 Environment.Exit(0);
 							}
-                         
 
 							 string startParameterValue	     = BankReportUtilLibrary.reportStartDateValue;// hasQuotes(BankReportUtilLibrary.partitioningParameterMinVal)?BankReportUtilLibrary.partitioningParameterMinVal:quoteString(BankReportUtilLibrary.partitioningParameterMinVal) ;
 							 string endParameterValue   	 = BankReportUtilLibrary.reportEndDateValue; //hasQuotes(BankReportUtilLibrary.partitioningParameterMaxVal)?BankReportUtilLibrary.partitioningParameterMaxVal:quoteString(BankReportUtilLibrary.partitioningParameterMaxVal) ;
+							if(BankReportUtilLibrary.breakIntoThreads){
 							 int  index                      = 0;
 							 minMaxThreadSet.Clear();
 							 foreach(string table in BankReportUtilLibrary.mainTablesInScript){
@@ -143,6 +143,11 @@ namespace BankReportRunner{
 
 								}
 								 waitForMinMaxThreads(minMaxThreadSet);
+
+						} else {
+
+							runReportAllScripts();
+						}
 
                   			    string finalReportScript = File.ReadAllText(BankReportUtilLibrary.finalScriptPath);
                                 
@@ -798,8 +803,13 @@ namespace BankReportRunner{
 
 					}
 
+				 foreach(KeyValuePair<string, string>  param in BankReportUtilLibrary.reportParameterToValueMap){
+				
+					 scriptBuilder = scriptBuilder.Replace(param.Key, "\'"+param.Value+"\'");
+		
+		         }
+				  
 					string replacementScript = " SELECT * FROM "+scriptMainTable+" WITH  (NOLOCK) WHERE "+partitionField+">="+startRecordID.ToString()+" AND "+partitionField+"<="+endRecordID.ToString()+")temp ";
-                    ;
 
 				  Thread  scriptPartionThread = 	new Thread(()=>{ 
 						  loadPartitionDataTables( "source", scriptBuilder.Replace(scriptMainTable, replacementScript).ToString(), index, scriptID );
@@ -822,10 +832,6 @@ namespace BankReportRunner{
                    BankReportUtilLibrary.writeToLog("Error running script number "+scriptID.ToString()+". Details: "+e.Message);
 
 				 }
-
-                  
-
-
 			  }
 
 			  public static  void  loadPartitionDataTables(string sourceServer,  string bulkQuery, int tabInd, int scriptID ){
@@ -907,7 +913,85 @@ namespace BankReportRunner{
 					
 	  
 				}
+  public static  void  loadTempReportTables(string sourceServer,  string bulkQuery, int tabInd){
+                   
+					string   targetConnectionString         = connectionStringMap[sourceServer];
+				    using(SqlConnection conn                = new SqlConnection(targetConnectionString)){
+						reportPartitionTables[tabInd]       = new DataTable();
+						 Console.WriteLine("tabInd: "+tabInd);
+						try{ 
+							if(conn.State==System.Data.ConnectionState.Closed) conn.Open();
+						    using(SqlCommand cmd = new SqlCommand(bulkQuery, conn)){
+								SqlDataReader dr   = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
+								DataTable dtSchema = dr.GetSchemaTable();
 
+								 if (dtSchema != null){
+									foreach (DataRow drow in dtSchema.Rows){
+										string columnName = System.Convert.ToString(drow["ColumnName"]);
+										DataColumn column = new DataColumn(columnName, (Type)(drow["DataType"]));
+										column.Unique = (bool)drow["IsUnique"];
+										column.AllowDBNull = (bool)drow["AllowDBNull"];
+										column.AutoIncrement = (bool)drow["IsAutoIncrement"];
+										if(reportPartitionTables[tabInd].Columns.Contains(columnName)) {
+											reportPartitionTables[tabInd].Columns.Add(column);
+										}
+									}
+								 }
+						}
+					     targetConnectionString                  = targetConnectionString.Replace("Network Library=DBMSSOCN","Provider=SQLOLEDB");
+						 Console.WriteLine("Running report script: "+bulkQuery);
+						 BankReportUtilLibrary.writeToLog("Running report script: "+bulkQuery);
+
+						 using (OleDbDataAdapter oda = new OleDbDataAdapter(bulkQuery, targetConnectionString)){
+								oda.SelectCommand.CommandTimeout = 0; 
+								DataSet ds = new DataSet();
+								oda.Fill(ds);
+								reportPartitionTables[tabInd]   = ds.Tables[0];
+						}
+						 
+
+					 }catch(Exception e){
+
+							if(e.Message.ToLower().Contains("transport")){
+									Console.WriteLine("Error while running report script: "+bulkQuery+". The error is: "+e.Message);
+									Console.WriteLine("The data fetch session would now be restarted");
+									BankReportUtilLibrary.writeToLog("Error while running report script: "+bulkQuery+". The error is: "+e.Message);
+									BankReportUtilLibrary.writeToLog(e.ToString());
+									BankReportUtilLibrary.writeToLog("The data fetch session would now be restarted");
+									loadTempReportTables( sourceServer,   bulkQuery,tabInd );
+									emailError.AppendLine("<div style=\"color:red\">Error while running report script: "+bulkQuery+". The error is: "+e.Message);
+									emailError.AppendLine("<div style=\"color:red\">(Restarted):"+e.StackTrace);
+								}else{
+									Console.WriteLine("Error while running bulk insert for table "+reportPartitionTables[tabInd].ToString()+": " + e.Message);
+									Console.WriteLine(e.StackTrace);
+									BankReportUtilLibrary.writeToLog(e.ToString());
+									 Console.WriteLine(e.ToString());
+									BankReportUtilLibrary.writeToLog("Error while running bulk insert script "+bulkQuery+": " + e.Message);
+									BankReportUtilLibrary.writeToLog(e.StackTrace);
+									emailError.AppendLine("<div style=\"color:red\">Error while running bulk insert script "+bulkQuery+": " + e.Message);
+									emailError.AppendLine("<div style=\"color:red\">"+e.StackTrace);
+								}
+					}
+					}
+                      bool isFirstInsert        = isFirstInsertMap[tabInd];					
+					  string  outputTableName   = BankReportUtilLibrary.scriptOutputTables[tabInd].ToString();
+		              
+					  lock (insertLock)  
+				     {  
+
+						string server  = "destination";
+						if(isFirstInsert){
+
+								createSQLTableFromDataTable(outputTableName, reportPartitionTables[tabInd], connectionStringMap[server]);	
+								isFirstInsertMap[tabInd] = false;				
+						} 
+
+						bulkCopyTableData("destination",  reportPartitionTables[tabInd], outputTableName);
+				
+					}
+					
+	  
+				}
 				 public static DataTable initParameterTable(){
 					DataTable table = new DataTable("PropertiesTable");
 			
@@ -967,7 +1051,47 @@ namespace BankReportRunner{
 					
 				}
 
- 			    public static void Main (string[] args){
+			  public static void  runReportAllScripts(){
+                 
+			     int   index             =  -1;
+				 try{
+					 
+				  scriptThreadSet                      = new HashSet<Thread>();	
+
+				  reportPartitionTables                = new DataTable[BankReportUtilLibrary.sourceScripts.Count];
+
+				  foreach (string scriptPath  in BankReportUtilLibrary.sourceScripts ){
+				  StringBuilder scriptBuilder          = new StringBuilder().Append(File.ReadAllText(scriptPath));
+				  
+				 foreach(KeyValuePair<string, string>  param in BankReportUtilLibrary.reportParameterToValueMap){
+				
+					 scriptBuilder = scriptBuilder.Replace(param.Key, "\'"+param.Value+"\'");
+		
+		         }
+				  
+				  Thread  scriptPartionThread = 	new Thread(()=>{ 
+					      int  tableIndex     = index;
+						  loadTempReportTables( "source", scriptBuilder.ToString(), tableIndex );			 
+						 });
+						 scriptPartionThread.Name    =  "script_partition_thread_"+index.ToString();
+						 scriptThreadSet.Add(scriptPartionThread);
+						 scriptPartionThread.Start(); 
+						 index = index+1;
+				  }
+
+				  foreach(Thread  scriptThread in scriptThreadSet){
+
+							scriptThread.Join();
+
+				  }
+				  createIndexesOnScriptTable(index);
+				 }catch(Exception e){
+					 
+					Console.WriteLine("Error running script number "+index.ToString()+". Details: "+e.Message);
+                    BankReportUtilLibrary.writeToLog("Error running script number "+index.ToString()+". Details: "+e.Message);
+
+				 }
+			  } 			    public static void Main (string[] args){
 				
 				 string configFile 		= ""; 
 

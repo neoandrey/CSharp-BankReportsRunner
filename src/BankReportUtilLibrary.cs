@@ -99,6 +99,8 @@ namespace BankReportRunner{
                 public static int  connectionPacketSize                                          = 8192;   
 
                 public static bool savePasswords                                                 = true;   
+
+                public static bool breakIntoThreads                                              = false;
                 public   BankReportUtilLibrary(){ 
 
                        initBankReportUtilLibrary();
@@ -228,6 +230,7 @@ namespace BankReportRunner{
                         scriptOrderMap               = reportConfig.script_order_map;
                         connectionPacketSize         = reportConfig.connection_packet_size;
                         savePasswords                = reportConfig.save_passwords;
+                        breakIntoThreads             = reportConfig.break_all_queries_into_threads;
 
                         if(!savePasswords){
 

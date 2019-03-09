@@ -1,17 +1,4 @@
-
-
-DECLARE  @start_date  DATETIME,
-
-@end_date  DATETIME,
-
-@report_date_end DATETIME,
-
-@report_date_start  DATETIME
-
-
-SELECT  @report_date_start    =  @start_date 
-
-SELECT  @report_date_start    =  @end_date 
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
 SELECT
 Warning	 = 'Warning',

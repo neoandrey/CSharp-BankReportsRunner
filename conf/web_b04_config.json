@@ -7,19 +7,17 @@
     "destination_port": 1433,
     "connection_packet_size": 16383,
     /* between 512 and 32767*/
-    "source_scripts": ["sql\\web_nibss_1.sql", "sql\\web_nibss_2.sql", "sql\\web_nibss_3.sql"],
-    "script_output_tables": ["b04_web_nibss_temp_1", "b04_web_nibss_temp_2", "b04_web_nibss_temp_3"],
+    "source_scripts": ["sql\\web_1.sql", "sql\\web_2.sql"],
+    "script_output_tables": ["b04_web_temp_1", "b04_web_temp_2"],
     "create_indexes_on_output_tables": true,
-    "final_output_table_name": "tbl_web_pos_acquirer_nibss_remote",
+    "final_output_table_name": "tbl_web_remote",
     "output_table_index_script_map": {
-        "b04_web_nibss_temp_1": "sql\\table_indexes.sql",
-        "b04_web_nibss_temp_2": "sql\\table_indexes.sql",
-        "b04_web_nibss_temp_3": "sql\\table_indexes.sql"
+        "b04_web_temp_1": "sql\\table_indexes.sql",
+        "b04_web_temp_2": "sql\\table_indexes.sql"
     },
     "script_order_map": {
-        "0": "sql\\web_nibss_1.sql",
-        "1": "sql\\web_nibss_2.sql",
-        "2": "sql\\web_nibss_3.sql"
+        "0": "sql\\web_1.sql",
+        "1": "sql\\web_2.sql"
     },
     "main_tables_in_script": ["tbl_xls_settlement", "post_tran_summary", "asp_visa_pos"],
     "partition_fields_for_main_tables": ["post_tran_id", "post_tran_id", "post_tran_id"],
@@ -27,18 +25,18 @@
     "concurrent_threads": 10,
     "batch_size": 1000,
     "has_date_range": true,
-    "report_start_date_value": "20190216",
-    "report_end_date_value": "20190217",
+    "report_start_date_value": "20171106",
+    "report_end_date_value": "20171106",
     "report_start_date_field": "@report_date_start",
     "report_end_date_field": "@report_date_end",
     "report_parameter_to_value_map": {
-        "@StartDate": "20190216",
-        "@EndDate": "20190216",
+        "@StartDate": "20171106",
+        "@EndDate": "20171106",
         "@SinkNodes": "testSnk",
         "@SourceNodes": "testSrc",
         "@show_full_pan": "",
-        "@report_date_start": "20190216",
-        "@report_date_end": "20190216",
+        "@report_date_start": "20171106",
+        "@report_date_end": "20171106",
         "@rpt_tran_id1": 0,
         "@rpt_tran_id": 0
     },
@@ -64,8 +62,7 @@
     "output_file_name": "",
     "wait_interval": 100,
     "temp_table_name_prefix": "temp_report_table",
-    "final_script_path": "sql\\web_nibss_final.sql",
-    "save_passwords": true,
-    "break_all_queries_into_threads": true
+    "final_script_path": "sql\\web_final.sql",
+    "save_passwords": true
 
 }

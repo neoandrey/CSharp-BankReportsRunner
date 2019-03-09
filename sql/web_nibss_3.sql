@@ -1,13 +1,4 @@
- 
-DECLARE  
-@report_date_end DATETIME,
-
-@report_date_start  DATETIME
-
-
-SELECT  @report_date_start    =  @StartDate 
-
-SELECT  @report_date_start    =  @StartDate 
+SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
 
 DECLARE  @list_of_source_nodes  TABLE(source_node	VARCHAR(30)) ;
 

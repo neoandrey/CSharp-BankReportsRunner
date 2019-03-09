@@ -64,6 +64,8 @@ namespace BankReportRunner
 
              public  int   connection_packet_size               {set; get;}
 
+             public bool  break_all_queries_into_threads        {set; get;}       
+
              public  bool save_passwords  {set; get;}
              
              

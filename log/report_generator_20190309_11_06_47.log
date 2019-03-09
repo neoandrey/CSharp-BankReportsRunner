@@ -1,0 +1,442 @@
+===========================Started Bank Report Session at 2019-03-09 11:06:47==============================
+2019-03-09 11:06:47=>Reading configurations from C:\Users\Mobolaji.Aina\Documents\c_sharp\bank_reports_runner\conf\bank_report_config.json  ...
+2019-03-09 11:06:48=>Configurations have been successfully initialised.
+2019-03-09 11:06:48=>System.Data.SqlClient.SqlException (0x80131904): Invalid object name 'tbl_xls_settlement'.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at BankReportRunner.BankReport.loadTempReportTables(String sourceServer, String bulkQuery, Int32 tabInd)
+ClientConnectionId:0a13c7f9-e8cc-415c-8d9f-55b6e61446df
+Error Number:208,State:1,Class:16
+2019-03-09 11:06:48=>Error while running bulk insert script SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+SELECT
+Warning	 = 'Warning',
+StartDate = 	CONVERT(VARCHAR(8), DATEADD(D, 1,'20190216'),112),  
+EndDate   =	CONVERT(VARCHAR(8), DATEADD(D, 1,'20190216'),112), 
+SourceNodeAlias = 'Reward',
+pan = 	dbo.fn_rpt_PanForDisplay(y.pan, null) ,
+terminal_id	=y.terminal_id, 
+acquiring_inst_id_code =	y.acquiring_inst_id_code,
+terminal_owner   = 	'Reward',
+merchant_type  = 	'5310',
+extended_tran_type_reward     =  'BURN',
+Category_name	='Discount Stores',
+Fee_type	='P',
+merchant_disc	=0.007500,
+fee_cap	=1200,
+amount_cap=	160000,
+bearer	='M',
+card_acceptor_id_code=	y.merchant_id, 
+card_acceptor_name_loc=	substring(y.card_acceptor_name_loc,1,40), 
+source_node_name=	'Reward',
+sink_node_name	='Reward', 
+tran_type	='00', 
+rsp_code_rsp	='00', 
+message_type=	'0200', 
+datetime_req	=y.trans_date,
+settle_amount_req=	0, 
+settle_amount_rsp=	0,
+settle_tran_fee_rsp=	0,
+TranID	=0 ,
+prev_post_tran_id = 	0, 
+system_trace_audit_nr	=y.stan, 
+message_reason_code	=0, 
+retrieval_reference_nr	=y.rr_number, 
+datetime_tran_local=	y.trans_date, 
+from_account_type=	0, 
+to_account_type=	0, 
+settle_currency_code=	'566', 
+settle_amount_impact=	0,
+tran_type_desciption=	'Goods and Services',
+rsp_code_description=	'Approved' ,
+settle_nr_decimals	=2 ,
+currency_alpha_code=	'NGN' ,
+currency_name	='Naira', 
+isPurchaseTrx	=1,
+isWithdrawTrx=	0,
+isRefundTrx	=0,
+isDepositTrx	=0,
+isInquiryTrx	=0,
+isTransferTrx=	0,
+isOtherTrx	=0,
+tran_reversed=	0,
+pan_encrypted=	0,
+from_account_id=	0,
+to_account_id	=0,
+payee	=0,
+extended_tran_type=	'0000',
+rdm_amount            =	ISNULL(y.rdm_amt,0),
+Reward_Discount       =	R.Reward_Discount,
+Addit_Charge            =	R.Addit_Charge,
+Addit_Party               =	R.Addit_Party,
+Amount_Cap_RD            =	R.Amount_Cap,
+Fee_Cap_RD              =	R.Fee_Cap,
+Fee_Discount_RD         =	R.Fee_Discount,
+Totalsgroup ='Reward',
+aggregate_column       =	y.rr_number+'_'+y.terminal_id+'_'+'000000'+'_'+cast((abs(ISNULL(y.rdm_amt,0))) as varchar(50))+'_'+y.pan,
+Unique_key=y.rr_number+'_'+'000000'+'_'+y.terminal_id+'_'+ cast((abs(ISNULL(y.rdm_amt,0))) as varchar(50))+'_'+'0200',
+tran_cash_req =	0, 
+tran_cash_rsp  =	0 ,
+tran_tran_fee_rsp  =	0 ,
+tran_currency_code    =   	0  
+
+
+
+FROM
+
+(
+SELECT * FROM  tbl_xls_settlement(NOLOCK) WHERE
+CONVERT(VARCHAR(8), trans_date,112) >= CONVERT(VARCHAR(8), DATEADD(D, 1,'20190216'),112) AND  CONVERT(VARCHAR(8), trans_date,112) <=  CONVERT(VARCHAR(8), DATEADD(D, 1,'20190216'),112)
+and ISNULL(rdm_amt,0) <>0
+and LEFT(terminal_id,1) = '2'
+and extended_trans_type is not null
+)y 
+
+
+left JOIN Reward_Category r (NOLOCK)
+ON substring(y.extended_trans_type,1,4) = r.reward_code
+						
+OPTION (RECOMPILE, OPTIMIZE FOR UNKNOWN)
+: Invalid object name 'tbl_xls_settlement'.
+2019-03-09 11:06:48=>   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at BankReportRunner.BankReport.loadTempReportTables(String sourceServer, String bulkQuery, Int32 tabInd)
+2019-03-09 11:06:48=>System.Data.SqlClient.SqlException (0x80131904): Invalid object name 'post_tran_summary'.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at BankReportRunner.BankReport.loadTempReportTables(String sourceServer, String bulkQuery, Int32 tabInd)
+ClientConnectionId:1768f807-ea70-40f6-b46d-3397beed3a76
+Error Number:208,State:1,Class:16
+2019-03-09 11:06:48=>Error while running bulk insert script SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+DECLARE  @list_of_source_nodes  TABLE(source_node	VARCHAR(30)) ;
+
+INSERT INTO  @list_of_source_nodes SELECT part FROM usf_split_string('testSrc',',');
+
+SELECT 
+				NULL AS Warning,
+				'20190216' as StartDate,  
+				'20190216' as EndDate, 
+				SourceNodeAlias = 
+				(CASE 
+					WHEN t.source_node_name IN (SELECT source_node from @list_of_source_nodes) THEN '-Our ATMs-'
+										ELSE t.source_node_name
+				END),
+				t.pan,
+				t.terminal_id, 
+				t.acquiring_inst_id_code,
+				t.terminal_owner,
+			merchant_type =	ISNULL(t.merchant_type,'VOID'),
+                                extended_tran_type_reward = 
+                                Case When t.terminal_id in 
+                                (select terminal_id from tbl_reward_OutOfband (nolock))
+                                 and dbo.fn_rpt_CardGroup (t.PAN) in ('1','4')
+
+                                 then substring(o.r_code,1,4) 
+                                  else ISNULL(substring(y.extended_trans_type,1,4),'0000')end,
+				Category_name =case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.Category_name,'VOID') 
+				else ISNULL(m.Category_name,'VOID') end,
+				Fee_type =  case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.fee_type,'VOID') 
+				else ISNULL(m.Fee_type,'VOID') end,
+			merchant_disc =	case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.merchant_disc,0.0) 
+				else ISNULL(m.merchant_disc,0.0) end,
+				fee_cap  = case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.fee_cap,0) 
+				else ISNULL(m.fee_cap,0) end,
+				amount_cap =case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.amount_cap,999999999999.99) 
+				else ISNULL(m.amount_cap,999999999999.99) end,
+				bearer =case when dbo.fn_rpt_MCC_Visa (t.merchant_type,t.terminal_id,T.tran_type,t.PAN) in ('1','2','3') then ISNULL(v.bearer,'M') 
+				else ISNULL(m.bearer,'M') end,
+				t.card_acceptor_id_code, t.card_acceptor_name_loc, t.source_node_name,t.sink_node_name, t.tran_type, t.rsp_code_rsp,t.message_type, t.datetime_req, 
+					dbo.formatAmount(t.settle_amount_req, t.settle_currency_code) AS settle_amount_req, 
+				dbo.formatAmount(t.settle_amount_rsp, t.settle_currency_code) AS settle_amount_rsp,
+				dbo.formatAmount(t.settle_tran_fee_rsp, t.settle_currency_code) AS settle_tran_fee_rsp,				t.post_tran_cust_id as TranID,
+				t.prev_post_tran_id,t.system_trace_audit_nr,t.message_reason_code, t.retrieval_reference_nr,t.datetime_tran_local, t.from_account_type, 
+				t.to_account_type, 
+				t.settle_currency_code, 
+				dbo.formatAmount( 			
+					CASE
+						WHEN (t.tran_type = '51') THEN -1 * t.settle_amount_impact
+						ELSE t.settle_amount_impact
+					END
+					, t.settle_currency_code ) AS settle_amount_impact,				
+				dbo.formatTranTypeStr(t.tran_type, t.extended_tran_type, t.message_type) as tran_type_desciption,
+				dbo.formatRspCodeStr(t.rsp_code_rsp) as rsp_code_description,
+				dbo.currencyNrDecimals(t.settle_currency_code) AS settle_nr_decimals,
+				dbo.currencyAlphaCode(t.settle_currency_code) AS currency_alpha_code,
+				dbo.currencyName(t.settle_currency_code) AS currency_name,
+				dbo.fn_rpt_isPurchaseTrx(t.tran_type) 	AS isPurchaseTrx,
+				dbo.fn_rpt_isWithdrawTrx(t.tran_type) 	AS isWithdrawTrx,
+				dbo.fn_rpt_isRefundTrx(t.tran_type) 		AS isRefundTrx,
+				dbo.fn_rpt_isDepositTrx(t.tran_type) 		AS isDepositTrx,
+				dbo.fn_rpt_isInquiryTrx(t.tran_type) 		AS isInquiryTrx,
+				dbo.fn_rpt_isTransferTrx(t.tran_type) 	AS isTransferTrx,
+				dbo.fn_rpt_isOtherTrx(t.tran_type) 		AS isOtherTrx,
+				t.tran_reversed,
+				t.pan_encrypted,
+				t.from_account_id,
+				t.to_account_id,
+				payee = isnull(t.payee,0),
+				extended_tran_type = isnull(t.extended_tran_type,0),
+                               rdm_amount = 0,
+                                R.Reward_Discount,
+                                R.Addit_Charge,
+                                R.Addit_Party,
+Amount_Cap_RD =R.Amount_Cap,
+               Fee_Cap_RD =                  R.Fee_Cap,
+               Fee_Discount_rd=                 R.Fee_Discount,
+                                t.totals_group,
+                aggregate_column  =  t.retrieval_reference_nr+'_'+t.terminal_id+'_'+'000000'+'_'+cast((abs(t.settle_amount_impact)) as varchar(50))+'_'+t.pan,
+                Unique_key=  t.retrieval_reference_nr+'_'+t.system_trace_audit_nr+'_'+t.terminal_id+'_'+ cast((t.settle_amount_impact) as varchar(50))+'_'+t.message_type,
+				
+                                dbo.formatAmount(t.tran_cash_req,t.tran_currency_code) AS tran_cash_req, 
+				dbo.formatAmount(t.tran_cash_req,t.tran_currency_code) AS tran_cash_rsp,
+				dbo.formatAmount(t.tran_cash_req,t.tran_currency_code) AS tran_tran_fee_rsp,
+		
+				dbo.formatAmount(t.tran_cash_req,t.tran_currency_code) AS tran_currency_code
+         into    #report_result_2   
+                 	
+	FROM
+				 ( SELECT * FROM  post_tran_summary (NOLOCK)  WHERE
+				  tran_completed = 1
+				and  CONVERT(VARCHAR(8),recon_business_date,112)  >=  CONVERT(VARCHAR(8),'20190216',112) AND CONVERT(VARCHAR(8),recon_business_date,112)  <=  CONVERT(VARCHAR(8),'20190216',112)
+				AND
+				tran_postilion_originated = 0
+				AND
+				(message_type IN ('0220','0200', '0400', '0420') )
+
+				AND
+				source_node_name IN (select source_node from  @list_of_source_nodes)
+				AND 
+					(
+					(CHARINDEX (  '3IWP', terminal_id) > 0 )OR
+					(CHARINDEX (  '3ICP', terminal_id) > 0 ) OR
+					(LEFT(terminal_id,1) = '2')OR--(t.terminal_id like '2%' AND t.source_node_name IN ('SWTASPPOSsrc', 'SWTASPTAMsrc'))
+					(LEFT(terminal_id,1) = '5')  OR
+                    (CHARINDEX ( '31WP', terminal_id) > 0 ) OR
+					(CHARINDEX ( '31CP', terminal_id) > 0) OR
+					( LEFT(terminal_id,1) = '6')
+					)
+				AND
+				sink_node_name NOT IN ('CCLOADsnk','GPRsnk','PAYDIRECTsnk','SWTMEGAsnk','VTUsnk','VTUSTOCKsnk')
+				AND
+				tran_type NOT IN ('31','50','21')
+                and merchant_type not in ('5371','2501','2504','2505','2506','2507','2508','2509','2510','2511')
+                                AND  NOT  (source_node_name in ('SWTNCS2src','SWTSHOPRTsrc','SWTNCSKIMsrc','SWTNCSKI2src','SWTFBPsrc','SWTUBAsrc','SWTZIBsrc','SWTPLATsrc','SWTFBNsrc','SWTHBCsrc','SWTWEMsrc','SWTDBLPOSsrc','SWTSBPsrc','SWTSHOPsrc') AND sink_node_name--+LEFT(totals_group,3)
+                               not in ('ASPPOSLMCsnk') AND not LEFT(pan,1) = '4' and not tran_type = '01')
+                                and NOT (totals_group in ('VISAGroup') and acquiring_inst_id_code = '627787')
+			                   and NOT (totals_group in ('VISAGroup') and sink_node_name not in ('ASPPOSVINsnk')
+			                           and not(source_node_name in ('SWTFBPsrc','SWTUBAsrc','SWTZIBsrc','SWTPLATsrc','SWTFBNsrc','SWTHBCsrc','SWTWEMsrc','SWTDBLPOSsrc','SWTSBPsrc','SWTSHOPsrc')  and sink_node_name = 'ASPPOSVISsnk'))	
+			                   AND NOT (source_node_name in ('SWTNCS2src','SWTSHOPRTsrc','SWTNCSKIMsrc','SWTNCSKI2src','SWTFBPsrc','SWTUBAsrc','SWTZIBsrc','SWTPLATsrc','SWTFBNsrc','SWTHBCsrc','SWTWEMsrc','SWTDBLPOSsrc','SWTSBPsrc','SWTSHOPsrc') AND sink_node_name = 'ASPPOSLMCsnk'
+                                         and totals_group in ('MCCGroup','CITIDEMCC'))	
+
+                AND
+              LEFT( source_node_name,2)  <> 'SB'
+              AND LEFT( sink_node_name,2)  <> 'SB'
+				 and 
+				      post_tran_id NOT IN (	SELECT  post_tran_id  FROM  tbl_late_reversals with  (NOLOCK) WHERE  CONVERT(VARCHAR(8),recon_business_date,112)  >=  CONVERT(VARCHAR(8),'20190216',112) AND CONVERT(VARCHAR(8),recon_business_date,112)  <=  CONVERT(VARCHAR(8),'20190216',112)
+				   )
+				 )t
+				left JOIN tbl_merchant_category m (NOLOCK)
+				ON t.merchant_type = m.category_code 
+				left JOIN tbl_merchant_category_visa v (NOLOCK)
+				ON t.merchant_type = v.category_code 
+				left JOIN tbl_merchant_account a (NOLOCK)
+				ON t.card_acceptor_id_code = a.card_acceptor_id_code   
+				left JOIN tbl_xls_settlement y (NOLOCK)
+				ON (t.terminal_id= y.terminal_id 
+				AND t.retrieval_reference_nr = y.rr_number 
+				AND substring (CAST (t.datetime_req AS VARCHAR(8000)), 1, 10)
+				= substring(CAST (y.trans_date AS VARCHAR(8000)), 1, 10)
+				and y.terminal_id not in (select terminal_id from tbl_reward_OutOfBand(nolock)))
+				left JOIN tbl_reward_OutOfBand O (NOLOCK)
+				ON t.terminal_id = o.terminal_id
+				left JOIN Reward_Category r (NOLOCK)
+				ON (substring(y.extended_trans_type,1,4) = r.reward_code or (substring(o.r_code,1,4) = r.reward_code  
+				and dbo.fn_rpt_CardGroup (t.PAN) in ('1','4')))
+				OPTION (OPTIMIZE FOR UNKNOWN)
+			: Invalid object name 'post_tran_summary'.
+2019-03-09 11:06:48=>   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at BankReportRunner.BankReport.loadTempReportTables(String sourceServer, String bulkQuery, Int32 tabInd)
+2019-03-09 11:06:48=>System.Data.SqlClient.SqlException (0x80131904): Invalid object name 'asp_visa_pos'.
+   at System.Data.SqlClient.SqlConnection.OnError(SqlException exception, Boolean breakConnection, Action`1 wrapCloseInAction)
+   at System.Data.SqlClient.TdsParser.ThrowExceptionAndWarning(TdsParserStateObject stateObj, Boolean callerHasConnectionLock, Boolean asyncClose)
+   at System.Data.SqlClient.TdsParser.TryRun(RunBehavior runBehavior, SqlCommand cmdHandler, SqlDataReader dataStream, BulkCopySimpleResultSet bulkCopyHandler, TdsParserStateObject stateObj, Boolean& dataReady)
+   at System.Data.SqlClient.SqlDataReader.TryConsumeMetaData()
+   at System.Data.SqlClient.SqlDataReader.get_MetaData()
+   at System.Data.SqlClient.SqlCommand.FinishExecuteReader(SqlDataReader ds, RunBehavior runBehavior, String resetOptionsString, Boolean isInternal, Boolean forDescribeParameterEncryption, Boolean shouldCacheForAlwaysEncrypted)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReaderTds(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, Boolean async, Int32 timeout, Task& task, Boolean asyncWrite, Boolean inRetry, SqlDataReader ds, Boolean describeParameterEncryptionRequest)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method, TaskCompletionSource`1 completion, Int32 timeout, Task& task, Boolean& usedCache, Boolean asyncWrite, Boolean inRetry)
+   at System.Data.SqlClient.SqlCommand.RunExecuteReader(CommandBehavior cmdBehavior, RunBehavior runBehavior, Boolean returnStream, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior, String method)
+   at System.Data.SqlClient.SqlCommand.ExecuteReader(CommandBehavior behavior)
+   at BankReportRunner.BankReport.loadTempReportTables(String sourceServer, String bulkQuery, Int32 tabInd)
+ClientConnectionId:6720503a-8fb7-4dd3-8999-fa076dbd306c
+Error Number:208,State:1,Class:16
+2019-03-09 11:06:48=>Error while running bulk insert script SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED
+
+DECLARE  @list_of_source_nodes  TABLE(source_node	VARCHAR(30)) ;
+
+INSERT INTO  @list_of_source_nodes SELECT part FROM usf_split_string('',',');
+
+ SELECT 
+		     				NULL AS Warning,
+		     				'20190216' as StartDate,  
+		     				'20190216' as EndDate, 
+		     				SourceNodeAlias = 
+		     				(CASE 
+		     					WHEN q.source_node_name IN (SELECT source_node FROM @list_of_source_nodes) THEN '-Our ATMs-'
+		     					ELSE q.source_node_name
+		     				END),
+		     				dbo.fn_rpt_PanForDisplay(q.pan, null) AS pan,
+		     				q.terminal_id, 
+		     				q.acquiring_inst_id_code,
+		     				q.terminal_owner,
+		     				--q.merchant_type,
+		     				ISNULL(q.merchant_type,'VOID')as merchant_type,
+		                                     extended_tran_type_reward = 
+		                                     Case When q.terminal_id in 
+		                                     (select terminal_id from tbl_reward_OutOfband (NOLOCK))
+		                                      and dbo.fn_rpt_CardGroup (q.PAN) in ('1','4')
+		     
+		                                      then substring(o.r_code,1,4) 
+		                                       else ISNULL(substring(y.extended_trans_type,1,4),'0000')end,
+		case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.Category_name,'VOID') 
+				     				else ISNULL(m.Category_name,'VOID') end as Category_name,
+				     				case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.fee_type,'VOID') 
+				     				else ISNULL(m.Fee_type,'VOID') end as Fee_type,
+				     				case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.merchant_disc,0.0) 
+				     				else ISNULL(m.merchant_disc,0.0) end as merchant_disc,
+				     				case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.fee_cap,0) 
+				     				else ISNULL(m.fee_cap,0) end as fee_cap,
+				     				case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.amount_cap,999999999999.99) 
+				     				else ISNULL(m.amount_cap,999999999999.99) end as amount_cap,
+				     				case when dbo.fn_rpt_MCC_Visa (q.merchant_type,q.terminal_id,q.tran_type,q.PAN) in ('1','2','3') then ISNULL(v.bearer,'M') 
+		     				else ISNULL(m.bearer,'M') end as bearer,
+		     				
+		     				
+		     				
+		     				q.card_acceptor_id_code, 
+		     				q.card_acceptor_name_loc, 
+		     				q.source_node_name,
+		     				q.sink_node_name, 
+		     				q.tran_type, 
+		     				q.rsp_code_rsp, 
+		     				q.message_type, 
+		     				q.datetime_req, 
+		     				
+		     				
+		     				dbo.formatAmount(q.settle_amount_req, q.settle_currency_code) AS settle_amount_req, 
+		     				dbo.formatAmount(q.settle_amount_rsp, q.settle_currency_code) AS settle_amount_rsp,
+		     				dbo.formatAmount(q.settle_tran_fee_rsp, q.settle_currency_code) AS settle_tran_fee_rsp,
+		     				
+		     				q.post_tran_cust_id as TranID,
+		     				q.prev_post_tran_id, 
+		     				q.system_trace_audit_nr, 
+		     				q.message_reason_code, 
+		     				q.retrieval_reference_nr, 
+		     				q.datetime_tran_local, 
+		     				q.from_account_type, 
+		     				q.to_account_type, 
+		     				q.settle_currency_code, 
+		     				
+		     				
+		     				--dbo.formatAmount(q.settle_amount_impact, q.settle_currency_code) as settle_amount_impact,
+		     				
+		     				dbo.formatAmount( 			
+		     					CASE
+		     						WHEN (q.tran_type = '51') THEN -1 * q.settle_amount_impact
+		     						ELSE q.settle_amount_impact
+		     					END
+		     					, q.settle_currency_code ) AS settle_amount_impact,				
+		     				
+		     				dbo.formatTranTypeStr(q.tran_type, q.extended_tran_type, q.message_type) as tran_type_desciption,
+		     				dbo.formatRspCodeStr(q.rsp_code_rsp) as rsp_code_description,
+		     				dbo.currencyNrDecimals(q.settle_currency_code) AS settle_nr_decimals,
+		     				dbo.currencyAlphaCode(q.settle_currency_code) AS currency_alpha_code,
+		     				dbo.currencyName(q.settle_currency_code) AS currency_name,
+		     				
+		     				dbo.fn_rpt_isPurchaseTrx(tran_type) 	AS isPurchaseTrx,
+		     				dbo.fn_rpt_isWithdrawTrx(tran_type) 	AS isWithdrawTrx,
+		     				dbo.fn_rpt_isRefundTrx(tran_type) 		AS isRefundTrx,
+		     				dbo.fn_rpt_isDepositTrx(tran_type) 		AS isDepositTrx,
+		     				dbo.fn_rpt_isInquiryTrx(tran_type) 		AS isInquiryTrx,
+		     				dbo.fn_rpt_isTransferTrx(tran_type) 	AS isTransferTrx,
+		     				dbo.fn_rpt_isOtherTrx(tran_type) 		AS isOtherTrx,
+		     				q.tran_reversed,
+		     				q.pan_encrypted,
+		     				q.from_account_id,
+		     				q.to_account_id,
+		     				isnull(q.payee,0)as payee,
+		     				isnull(q.extended_tran_type,0) extended_tran_type ,
+		                                     0  rdm_amount,
+		                                     R.Reward_Discount,
+		                                     R.Addit_Charge,
+		                                     R.Addit_Party,
+		                                    Amount_Cap_RD = R.Amount_Cap,
+		                               Fee_Cap_RD =    R.Fee_Cap,
+		                               Fee_Discount_RD=      R.Fee_Discount,
+		                                     q.totals_group,
+		                      q.retrieval_reference_nr+'_'+q.terminal_id+'_'+'000000'+'_'+cast((abs(q.settle_amount_impact)) as varchar(50))+'_'+q.pan as aggregate_column,
+		                      q.retrieval_reference_nr+'_'+q.system_trace_audit_nr+'_'+q.terminal_id+'_'+ cast((q.settle_amount_impact) as varchar(50))+'_'+q.message_type as unique_key,
+		     				
+		                                     dbo.formatAmount(q.tran_cash_req,q.tran_currency_code) AS tran_cash_req, 
+		     				dbo.formatAmount(q.tran_cash_req,q.tran_currency_code) AS tran_cash_rsp,
+		     				dbo.formatAmount(q.tran_cash_req,q.tran_currency_code) AS tran_tran_fee_rsp,
+		     		
+		     				dbo.formatAmount(q.tran_cash_req,q.tran_currency_code) AS tran_currency_code
+		            
+		     	FROM
+		     				 (  
+							    SELECT  * FROM  asp_visa_pos (NOLOCK) WHERE tran_completed = 1
+and
+CONVERT(VARCHAR(8),recon_business_date,112)  >=  CONVERT(VARCHAR(8),'20190216',112) AND CONVERT(VARCHAR(8),recon_business_date,112)  <=  CONVERT(VARCHAR(8),'20190216',112)
+AND
+tran_postilion_originated = 0--oremeyi changed this from '1'- 04032009 
+AND
+(message_type IN ('0220','0200', '0400', '0420') )
+
+AND     				    						    				
+sink_node_name NOT IN ('CCLOADsnk','GPRsnk','PAYDIRECTsnk','SWTMEGAsnk','VTUsnk','VTUSTOCKsnk')------ij added SWTMEGAsnk
+AND
+tran_type NOT IN ('31','50','21')
+and merchant_type not in ('5371','2501','2504','2505','2506','2507','2508','2509','2510','2511')
+AND
+LEFT( source_node_name,2)  <> 'SB'
+AND LEFT( sink_node_name,2)  <> 'SB' --AND not( sink_node_
